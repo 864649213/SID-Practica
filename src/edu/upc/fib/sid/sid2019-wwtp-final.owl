@@ -1,0 +1,646 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://fib.upc.edu/sid/2019/wwtp#"
+     xml:base="http://fib.upc.edu/sid/2019/wwtp"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://fib.upc.edu/sid/2019/wwtp">
+        <rdfs:comment>Versión simplificada de WaWO+ para una ontología de cuencas de río.</rdfs:comment>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Datatypes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#cubicMeters -->
+
+    <rdfs:Datatype rdf:about="http://fib.upc.edu/sid/2019/wwtp#cubicMeters">
+        <owl:equivalentClass rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+    </rdfs:Datatype>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#numberOfSeconds -->
+
+    <rdfs:Datatype rdf:about="http://fib.upc.edu/sid/2019/wwtp#numberOfSeconds">
+        <owl:equivalentClass rdf:resource="http://www.w3.org/2001/XMLSchema#unsignedInt"/>
+    </rdfs:Datatype>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#enforcesSanction -->
+
+    <owl:ObjectProperty rdf:about="http://fib.upc.edu/sid/2019/wwtp#enforcesSanction"/>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#hasPollutant -->
+
+    <owl:ObjectProperty rdf:about="http://fib.upc.edu/sid/2019/wwtp#hasPollutant">
+        <rdfs:range rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Pollutant"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#hasPollutantAmount -->
+
+    <owl:ObjectProperty rdf:about="http://fib.upc.edu/sid/2019/wwtp#hasPollutantAmount">
+        <rdfs:range rdf:resource="http://fib.upc.edu/sid/2019/wwtp#PollutantAmount"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#hasRiverSegment -->
+
+    <owl:ObjectProperty rdf:about="http://fib.upc.edu/sid/2019/wwtp#hasRiverSegment">
+        <rdfs:range rdf:resource="http://fib.upc.edu/sid/2019/wwtp#River"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#pollutantGenerated -->
+
+    <owl:ObjectProperty rdf:about="http://fib.upc.edu/sid/2019/wwtp#pollutantGenerated">
+        <rdfs:domain rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Industry"/>
+        <rdfs:range rdf:resource="http://fib.upc.edu/sid/2019/wwtp#PollutantAmount"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#pollutantTreated -->
+
+    <owl:ObjectProperty rdf:about="http://fib.upc.edu/sid/2019/wwtp#pollutantTreated">
+        <rdfs:range rdf:resource="http://fib.upc.edu/sid/2019/wwtp#PollutantAmount"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#receivesWaterPerTimeUnit -->
+
+    <owl:ObjectProperty rdf:about="http://fib.upc.edu/sid/2019/wwtp#receivesWaterPerTimeUnit">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#costPerCubicMeterTreated -->
+
+    <owl:DatatypeProperty rdf:about="http://fib.upc.edu/sid/2019/wwtp#costPerCubicMeterTreated">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#costPerTonOfPollutantTreated -->
+
+    <owl:DatatypeProperty rdf:about="http://fib.upc.edu/sid/2019/wwtp#costPerTonOfPollutantTreated"/>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#hasChanceOfDetectingIllegalDischarge -->
+
+    <owl:DatatypeProperty rdf:about="http://fib.upc.edu/sid/2019/wwtp#hasChanceOfDetectingIllegalDischarge"/>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#hasTimeUnit -->
+
+    <owl:DatatypeProperty rdf:about="http://fib.upc.edu/sid/2019/wwtp#hasTimeUnit">
+        <rdfs:range rdf:resource="http://fib.upc.edu/sid/2019/wwtp#numberOfSeconds"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#hasValue -->
+
+    <owl:DatatypeProperty rdf:about="http://fib.upc.edu/sid/2019/wwtp#hasValue">
+        <rdfs:domain rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Amount"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#hasVolume -->
+
+    <owl:DatatypeProperty rdf:about="http://fib.upc.edu/sid/2019/wwtp#hasVolume"/>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#maximumProduction -->
+
+    <owl:DatatypeProperty rdf:about="http://fib.upc.edu/sid/2019/wwtp#maximumProduction"/>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#profitPerTonProduced -->
+
+    <owl:DatatypeProperty rdf:about="http://fib.upc.edu/sid/2019/wwtp#profitPerTonProduced"/>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#releasedWaterPerTimeUnit -->
+
+    <owl:DatatypeProperty rdf:about="http://fib.upc.edu/sid/2019/wwtp#releasedWaterPerTimeUnit">
+        <rdfs:domain rdf:resource="http://fib.upc.edu/sid/2019/wwtp#River"/>
+        <rdfs:range rdf:resource="http://fib.upc.edu/sid/2019/wwtp#cubicMeters"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#sanctionPerTonDischarged -->
+
+    <owl:DatatypeProperty rdf:about="http://fib.upc.edu/sid/2019/wwtp#sanctionPerTonDischarged"/>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#storageAvailability -->
+
+    <owl:DatatypeProperty rdf:about="http://fib.upc.edu/sid/2019/wwtp#storageAvailability">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Entity"/>
+        <rdfs:range rdf:resource="http://fib.upc.edu/sid/2019/wwtp#cubicMeters"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#wastePerProduction -->
+
+    <owl:DatatypeProperty rdf:about="http://fib.upc.edu/sid/2019/wwtp#wastePerProduction"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Action -->
+
+    <owl:Class rdf:about="http://fib.upc.edu/sid/2019/wwtp#Action"/>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Amount -->
+
+    <owl:Class rdf:about="http://fib.upc.edu/sid/2019/wwtp#Amount">
+        <owl:equivalentClass>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://fib.upc.edu/sid/2019/wwtp#hasValue"/>
+                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+            </owl:Restriction>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Chemicals -->
+
+    <owl:Class rdf:about="http://fib.upc.edu/sid/2019/wwtp#Chemicals">
+        <rdfs:subClassOf rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Industry"/>
+    </owl:Class>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Discharge -->
+
+    <owl:Class rdf:about="http://fib.upc.edu/sid/2019/wwtp#Discharge">
+        <rdfs:subClassOf rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Action"/>
+    </owl:Class>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Entity -->
+
+    <owl:Class rdf:about="http://fib.upc.edu/sid/2019/wwtp#Entity"/>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Food -->
+
+    <owl:Class rdf:about="http://fib.upc.edu/sid/2019/wwtp#Food">
+        <rdfs:subClassOf rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Industry"/>
+    </owl:Class>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Industry -->
+
+    <owl:Class rdf:about="http://fib.upc.edu/sid/2019/wwtp#Industry">
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://fib.upc.edu/sid/2019/wwtp#Entity"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://fib.upc.edu/sid/2019/wwtp#pollutantGenerated"/>
+                        <owl:someValuesFrom rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Wastewater"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Ironworks -->
+
+    <owl:Class rdf:about="http://fib.upc.edu/sid/2019/wwtp#Ironworks">
+        <rdfs:subClassOf rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Industry"/>
+    </owl:Class>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#PaperMill -->
+
+    <owl:Class rdf:about="http://fib.upc.edu/sid/2019/wwtp#PaperMill">
+        <rdfs:subClassOf rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Industry"/>
+    </owl:Class>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Pollutant -->
+
+    <owl:Class rdf:about="http://fib.upc.edu/sid/2019/wwtp#Pollutant"/>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#PollutantAmount -->
+
+    <owl:Class rdf:about="http://fib.upc.edu/sid/2019/wwtp#PollutantAmount">
+        <rdfs:subClassOf rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Amount"/>
+        <rdfs:comment>Esta cantidad representa una concentración en gr/m3</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#River -->
+
+    <owl:Class rdf:about="http://fib.upc.edu/sid/2019/wwtp#River">
+        <rdfs:subClassOf rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Entity"/>
+    </owl:Class>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#SanctioningPolicy -->
+
+    <owl:Class rdf:about="http://fib.upc.edu/sid/2019/wwtp#SanctioningPolicy"/>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Slaughterhouse -->
+
+    <owl:Class rdf:about="http://fib.upc.edu/sid/2019/wwtp#Slaughterhouse">
+        <rdfs:subClassOf rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Industry"/>
+    </owl:Class>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Store -->
+
+    <owl:Class rdf:about="http://fib.upc.edu/sid/2019/wwtp#Store">
+        <rdfs:subClassOf rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Action"/>
+    </owl:Class>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#System -->
+
+    <owl:Class rdf:about="http://fib.upc.edu/sid/2019/wwtp#System"/>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Treat -->
+
+    <owl:Class rdf:about="http://fib.upc.edu/sid/2019/wwtp#Treat">
+        <rdfs:subClassOf rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Action"/>
+    </owl:Class>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#TreatmentPlant -->
+
+    <owl:Class rdf:about="http://fib.upc.edu/sid/2019/wwtp#TreatmentPlant">
+        <rdfs:subClassOf rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Entity"/>
+    </owl:Class>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Wastewater -->
+
+    <owl:Class rdf:about="http://fib.upc.edu/sid/2019/wwtp#Wastewater">
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://fib.upc.edu/sid/2019/wwtp#WaterMass"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://fib.upc.edu/sid/2019/wwtp#hasPollutant"/>
+                        <owl:someValuesFrom rdf:resource="http://fib.upc.edu/sid/2019/wwtp#PollutantAmount"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#WaterMass -->
+
+    <owl:Class rdf:about="http://fib.upc.edu/sid/2019/wwtp#WaterMass"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#BesosRiverSanctioningPolicy -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#BesosRiverSanctioningPolicy">
+        <rdf:type rdf:resource="http://fib.upc.edu/sid/2019/wwtp#SanctioningPolicy"/>
+        <hasChanceOfDetectingIllegalDischarge rdf:datatype="http://www.w3.org/2001/XMLSchema#float">30.0</hasChanceOfDetectingIllegalDischarge>
+        <sanctionPerTonDischarged rdf:datatype="http://www.w3.org/2001/XMLSchema#int">20</sanctionPerTonDischarged>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#CentralRiverSegment -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#CentralRiverSegment">
+        <rdf:type rdf:resource="http://fib.upc.edu/sid/2019/wwtp#River"/>
+        <receivesWaterPerTimeUnit rdf:resource="http://fib.upc.edu/sid/2019/wwtp#WaterReceived"/>
+        <releasedWaterPerTimeUnit rdf:datatype="http://www.w3.org/2001/XMLSchema#float">2000.0</releasedWaterPerTimeUnit>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#FoodSuspendedSolidsGeneration -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#FoodSuspendedSolidsGeneration">
+        <hasPollutant rdf:resource="http://fib.upc.edu/sid/2019/wwtp#SuspendedSolids"/>
+        <hasValue rdf:datatype="http://www.w3.org/2001/XMLSchema#float">50.0</hasValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Industry-1 -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#Industry-1">
+        <rdf:type rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Food"/>
+        <pollutantGenerated rdf:resource="http://fib.upc.edu/sid/2019/wwtp#FoodSuspendedSolidsGeneration"/>
+        <maximumProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">10.0</maximumProduction>
+        <profitPerTonProduced rdf:datatype="http://www.w3.org/2001/XMLSchema#int">10</profitPerTonProduced>
+        <storageAvailability rdf:datatype="http://www.w3.org/2001/XMLSchema#float">500.0</storageAvailability>
+        <wastePerProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">5.0</wastePerProduction>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Industry-10 -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#Industry-10">
+        <rdf:type rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Food"/>
+        <pollutantGenerated rdf:resource="http://fib.upc.edu/sid/2019/wwtp#FoodSuspendedSolidsGeneration"/>
+        <maximumProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">10.0</maximumProduction>
+        <profitPerTonProduced rdf:datatype="http://www.w3.org/2001/XMLSchema#int">10</profitPerTonProduced>
+        <storageAvailability rdf:datatype="http://www.w3.org/2001/XMLSchema#float">500.0</storageAvailability>
+        <wastePerProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">5.0</wastePerProduction>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Industry-11 -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#Industry-11">
+        <rdf:type rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Food"/>
+        <pollutantGenerated rdf:resource="http://fib.upc.edu/sid/2019/wwtp#FoodSuspendedSolidsGeneration"/>
+        <maximumProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">10.0</maximumProduction>
+        <profitPerTonProduced rdf:datatype="http://www.w3.org/2001/XMLSchema#int">10</profitPerTonProduced>
+        <storageAvailability rdf:datatype="http://www.w3.org/2001/XMLSchema#float">500.0</storageAvailability>
+        <wastePerProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">5.0</wastePerProduction>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Industry-12 -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#Industry-12">
+        <rdf:type rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Food"/>
+        <pollutantGenerated rdf:resource="http://fib.upc.edu/sid/2019/wwtp#FoodSuspendedSolidsGeneration"/>
+        <maximumProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">10.0</maximumProduction>
+        <profitPerTonProduced rdf:datatype="http://www.w3.org/2001/XMLSchema#int">10</profitPerTonProduced>
+        <storageAvailability rdf:datatype="http://www.w3.org/2001/XMLSchema#float">500.0</storageAvailability>
+        <wastePerProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">5.0</wastePerProduction>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Industry-2 -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#Industry-2">
+        <rdf:type rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Food"/>
+        <pollutantGenerated rdf:resource="http://fib.upc.edu/sid/2019/wwtp#FoodSuspendedSolidsGeneration"/>
+        <maximumProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">10.0</maximumProduction>
+        <profitPerTonProduced rdf:datatype="http://www.w3.org/2001/XMLSchema#int">10</profitPerTonProduced>
+        <storageAvailability rdf:datatype="http://www.w3.org/2001/XMLSchema#float">500.0</storageAvailability>
+        <wastePerProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">5.0</wastePerProduction>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Industry-3 -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#Industry-3">
+        <rdf:type rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Food"/>
+        <pollutantGenerated rdf:resource="http://fib.upc.edu/sid/2019/wwtp#FoodSuspendedSolidsGeneration"/>
+        <maximumProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">10.0</maximumProduction>
+        <profitPerTonProduced rdf:datatype="http://www.w3.org/2001/XMLSchema#int">10</profitPerTonProduced>
+        <storageAvailability rdf:datatype="http://www.w3.org/2001/XMLSchema#float">500.0</storageAvailability>
+        <wastePerProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">5.0</wastePerProduction>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Industry-4 -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#Industry-4">
+        <rdf:type rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Food"/>
+        <pollutantGenerated rdf:resource="http://fib.upc.edu/sid/2019/wwtp#FoodSuspendedSolidsGeneration"/>
+        <maximumProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">10.0</maximumProduction>
+        <profitPerTonProduced rdf:datatype="http://www.w3.org/2001/XMLSchema#int">10</profitPerTonProduced>
+        <storageAvailability rdf:datatype="http://www.w3.org/2001/XMLSchema#float">500.0</storageAvailability>
+        <wastePerProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">5.0</wastePerProduction>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Industry-5 -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#Industry-5">
+        <rdf:type rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Food"/>
+        <pollutantGenerated rdf:resource="http://fib.upc.edu/sid/2019/wwtp#FoodSuspendedSolidsGeneration"/>
+        <maximumProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">10.0</maximumProduction>
+        <profitPerTonProduced rdf:datatype="http://www.w3.org/2001/XMLSchema#int">10</profitPerTonProduced>
+        <storageAvailability rdf:datatype="http://www.w3.org/2001/XMLSchema#float">500.0</storageAvailability>
+        <wastePerProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">5.0</wastePerProduction>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Industry-6 -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#Industry-6">
+        <rdf:type rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Food"/>
+        <pollutantGenerated rdf:resource="http://fib.upc.edu/sid/2019/wwtp#FoodSuspendedSolidsGeneration"/>
+        <maximumProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">10.0</maximumProduction>
+        <profitPerTonProduced rdf:datatype="http://www.w3.org/2001/XMLSchema#int">10</profitPerTonProduced>
+        <storageAvailability rdf:datatype="http://www.w3.org/2001/XMLSchema#float">500.0</storageAvailability>
+        <wastePerProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">5.0</wastePerProduction>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Industry-7 -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#Industry-7">
+        <rdf:type rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Food"/>
+        <pollutantGenerated rdf:resource="http://fib.upc.edu/sid/2019/wwtp#FoodSuspendedSolidsGeneration"/>
+        <maximumProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">10.0</maximumProduction>
+        <profitPerTonProduced rdf:datatype="http://www.w3.org/2001/XMLSchema#int">10</profitPerTonProduced>
+        <storageAvailability rdf:datatype="http://www.w3.org/2001/XMLSchema#float">500.0</storageAvailability>
+        <wastePerProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">5.0</wastePerProduction>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Industry-8 -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#Industry-8">
+        <rdf:type rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Food"/>
+        <pollutantGenerated rdf:resource="http://fib.upc.edu/sid/2019/wwtp#FoodSuspendedSolidsGeneration"/>
+        <maximumProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">10.0</maximumProduction>
+        <profitPerTonProduced rdf:datatype="http://www.w3.org/2001/XMLSchema#int">10</profitPerTonProduced>
+        <storageAvailability rdf:datatype="http://www.w3.org/2001/XMLSchema#float">500.0</storageAvailability>
+        <wastePerProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">5.0</wastePerProduction>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#Industry-9 -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#Industry-9">
+        <rdf:type rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Food"/>
+        <pollutantGenerated rdf:resource="http://fib.upc.edu/sid/2019/wwtp#FoodSuspendedSolidsGeneration"/>
+        <maximumProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">10.0</maximumProduction>
+        <profitPerTonProduced rdf:datatype="http://www.w3.org/2001/XMLSchema#int">10</profitPerTonProduced>
+        <storageAvailability rdf:datatype="http://www.w3.org/2001/XMLSchema#float">500.0</storageAvailability>
+        <wastePerProduction rdf:datatype="http://www.w3.org/2001/XMLSchema#float">5.0</wastePerProduction>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#PlantaBesos -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#PlantaBesos">
+        <rdf:type rdf:resource="http://fib.upc.edu/sid/2019/wwtp#TreatmentPlant"/>
+        <pollutantTreated rdf:resource="http://fib.upc.edu/sid/2019/wwtp#PlantaBesosSuspendedSolidsTreated"/>
+        <costPerCubicMeterTreated rdf:datatype="http://www.w3.org/2001/XMLSchema#int">1</costPerCubicMeterTreated>
+        <costPerTonOfPollutantTreated rdf:datatype="http://www.w3.org/2001/XMLSchema#int">1</costPerTonOfPollutantTreated>
+        <storageAvailability rdf:datatype="http://www.w3.org/2001/XMLSchema#float">750.0</storageAvailability>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#PlantaBesosSuspendedSolidsTreated -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#PlantaBesosSuspendedSolidsTreated">
+        <rdf:type rdf:resource="http://fib.upc.edu/sid/2019/wwtp#PollutantAmount"/>
+        <pollutantTreated rdf:resource="http://fib.upc.edu/sid/2019/wwtp#SuspendedSolids"/>
+        <hasValue rdf:datatype="http://www.w3.org/2001/XMLSchema#float">20.0</hasValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#SIDBesosRiver2019 -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#SIDBesosRiver2019">
+        <rdf:type rdf:resource="http://fib.upc.edu/sid/2019/wwtp#System"/>
+        <enforcesSanction rdf:resource="http://fib.upc.edu/sid/2019/wwtp#BesosRiverSanctioningPolicy"/>
+        <hasRiverSegment rdf:resource="http://fib.upc.edu/sid/2019/wwtp#CentralRiverSegment"/>
+        <hasTimeUnit rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</hasTimeUnit>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#SuspendedSolids -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#SuspendedSolids"/>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#WaterReceived -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#WaterReceived">
+        <rdf:type rdf:resource="http://fib.upc.edu/sid/2019/wwtp#Wastewater"/>
+        <hasPollutantAmount rdf:resource="http://fib.upc.edu/sid/2019/wwtp#WaterReceivedSolidsConcentration"/>
+        <hasVolume rdf:datatype="http://www.w3.org/2001/XMLSchema#int">2000</hasVolume>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://fib.upc.edu/sid/2019/wwtp#WaterReceivedSolidsConcentration -->
+
+    <owl:NamedIndividual rdf:about="http://fib.upc.edu/sid/2019/wwtp#WaterReceivedSolidsConcentration">
+        <rdf:type rdf:resource="http://fib.upc.edu/sid/2019/wwtp#PollutantAmount"/>
+        <hasPollutant rdf:resource="http://fib.upc.edu/sid/2019/wwtp#SuspendedSolids"/>
+        <hasValue rdf:datatype="http://www.w3.org/2001/XMLSchema#float">5.0</hasValue>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+
