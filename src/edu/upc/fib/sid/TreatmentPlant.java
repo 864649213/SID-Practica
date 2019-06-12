@@ -10,6 +10,7 @@ import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.ContractNetResponder;
+import java.net.URISyntaxException;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -17,8 +18,30 @@ import java.util.logging.Logger;
 
 public class TreatmentPlant extends Agent {
     private Logger logger = Logger.getLogger("TreatmentPlant");
+    
+    float maxVolume;    // in m3
+    float actVolume;
+    float actMass;  // in tons
+    float costPerMCubicWater;
+    float costPerTonsSolid;
+    
+    private WwtpDomain domini;
 
     protected void setup() {
+        try {
+            domini = OntologyParser.parse();
+            maxVolume = domini.getPlantStorageAvailability();
+            costPerMCubicWater = domini.getCostPerCubicMeterTreated();
+            costPerTonsSolid = domini.getCostPerTonOfPollutantTreated();
+        } catch (URISyntaxException ex) {
+            maxVolume = 750;
+            costPerMCubicWater = 1;
+            costPerTonsSolid = 1;
+        }
+        actVolume = 0;
+        actMass = 0;
+        
+        
         final DFAgentDescription desc = new DFAgentDescription();
         desc.setName(getAID());
 
@@ -32,6 +55,7 @@ public class TreatmentPlant extends Agent {
         } catch (FIPAException e) {
             e.printStackTrace();
         }
+        
 
         final ParallelBehaviour parallelBehaviour = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
 
@@ -51,24 +75,54 @@ public class TreatmentPlant extends Agent {
             @Override
             protected ACLMessage handleCfp(ACLMessage cfp) {
                 heldConversations.add(cfp.getConversationId());
+                String str = cfp.getContent();
+                str = str.replace("(", "").replace(")", "");
+                String[] splitted = str.split("\\s+");
+                float volumeIn = Float.parseFloat(splitted[2]);
+                float concentrationIn = Float.parseFloat(splitted[4]);
+                float massIn = volumeIn * concentrationIn;
+                
                 final ACLMessage reply = cfp.createReply();
-                if(Math.random() > 0.5) {
+                
+                // aun hay espacio
+                if(actVolume + volumeIn <= maxVolume) {
                     reply.setPerformative(ACLMessage.PROPOSE);
-                    reply.setContent("(transaction :price 1000)");
-                } else {
-                    reply.setPerformative(ACLMessage.REFUSE);
+                    float price = volumeIn*costPerMCubicWater + massIn*costPerTonsSolid;
+                    price = 2*price; // beneficio 100%
+                    String msg = "(transaction :price " + price + ")";
+                    reply.setContent(msg);
+                } 
+                else {  // no hay espacio, verter agua con contaminacion al rio, subir precio o rechazo
+                    if (Math.random() <= 0.3) {
+                        reply.setPerformative(ACLMessage.PROPOSE);
+                        float price = volumeIn*costPerMCubicWater + massIn*costPerTonsSolid;
+                        price = 4*price; // beneficio 300%
+                        String msg = "(transaction :price " + price + ")";
+                        reply.setContent(msg);
+                    }
+                    else reply.setPerformative(ACLMessage.REFUSE);
                 }
                 return reply;
             }
 
             @Override
             protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
-                final ACLMessage reply = accept.createReply();
-                if(Math.random() > 0.4) {
-                    reply.setPerformative(ACLMessage.INFORM);
-                } else if(Math.random() > 0.1) {
-                    reply.setPerformative(ACLMessage.FAILURE);
+                final ACLMessage reply = accept.createReply();  
+                String str = cfp.getContent();
+                str = str.replace("(", "").replace(")", "");
+                String[] splitted = str.split("\\s+");
+                float volumeIn = Float.parseFloat(splitted[2]);
+                float concentrationIn = Float.parseFloat(splitted[4]);
+                float massIn = volumeIn * concentrationIn;
+                if(actVolume + volumeIn <= maxVolume) { // al rio directamente
+                    sendToEnvironment(volumeIn, concentrationIn);
                 }
+                else {  // guardarlo para enviar al siguiente tick
+                    actVolume += volumeIn;
+                    actMass += massIn; 
+                }
+                
+                reply.setPerformative(ACLMessage.INFORM);
                 return reply;
             }
         };
@@ -77,33 +131,37 @@ public class TreatmentPlant extends Agent {
         parallelBehaviour.addSubBehaviour(new TickerBehaviour(this, 1000) {
             @Override
             protected void onTick() {
-                double currentConcentration = Math.random();
-                double currentAvailability = Math.random() * 750;
+                float currentConcentration = actMass/actVolume;
 
                 logger.info("TREATMENTPLANT[currentConcentration]: " + currentConcentration);
-                logger.info("TREATMENTPLANT[currentAvailability]: " + currentAvailability);
+                logger.info("TREATMENTPLANT[currentAvailability]: " + actVolume);
 
-                if(Math.random() > 0.9) {
-                    final DFAgentDescription desc = new DFAgentDescription();
-                    final ServiceDescription sdesc = new ServiceDescription();
-                    sdesc.setType("Environment");
-                    desc.addServices(sdesc);
-                    try {
-                        final DFAgentDescription[] environments = DFService.search(TreatmentPlant.this, getDefaultDF(), desc,
-                                new SearchConstraints());
-                        final AID environment = environments[0].getName();
-                        final ACLMessage aclMessage = new ACLMessage(ACLMessage.REQUEST);
-                        aclMessage.setSender(TreatmentPlant.this.getAID());
-                        aclMessage.addReceiver(environment);
-                        aclMessage.setContent("(discharge :volume-water 100 :concentration-pollutant 0.7)");
-                        TreatmentPlant.this.send(aclMessage);
-                    } catch (FIPAException e) {
-                        e.printStackTrace();
-                    }
-                }
+                sendToEnvironment(actVolume, currentConcentration);
+                actVolume = 0;
+                actMass = 0;
+                
             }
         });
 
         this.addBehaviour(parallelBehaviour);
+    }
+    
+    public void sendToEnvironment(float volume, float concentration) {
+        final DFAgentDescription desc = new DFAgentDescription();
+        final ServiceDescription sdesc = new ServiceDescription();
+        sdesc.setType("Environment");
+        desc.addServices(sdesc);
+        try {
+            final DFAgentDescription[] environments = DFService.search(TreatmentPlant.this, getDefaultDF(), desc,
+                    new SearchConstraints());
+            final AID environment = environments[0].getName();
+            final ACLMessage aclMessage = new ACLMessage(ACLMessage.REQUEST);
+            aclMessage.setSender(TreatmentPlant.this.getAID());
+            aclMessage.addReceiver(environment);
+            aclMessage.setContent("(discharge :volume-water " + volume +" :concentration-pollutant " + concentration +")");
+            TreatmentPlant.this.send(aclMessage);
+        } catch (FIPAException e) {
+            e.printStackTrace();
+        }
     }
 }
