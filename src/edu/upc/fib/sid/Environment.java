@@ -40,6 +40,12 @@ public class Environment extends Agent {
         
         try {
             domini = OntologyParser.parse();
+            volumeIn = domini.getWaterReceivedVolume();
+            concentrationIn = domini.getWaterReceivedSolidsConcentration();       
+            volumeOut = domini.getReleasedWaterPerTimeUnit();
+            sanctionProbability = domini.getChanceOfDetectingIllegalDischarge();
+            sanctionPerTonDischarged = domini.getSanctionPerTonDischarged();
+            
         } catch (URISyntaxException ex) {
             Logger.getLogger(Environment.class.getName()).log(Level.SEVERE, null, ex);
             volumeIn = 2000;
@@ -51,12 +57,6 @@ public class Environment extends Agent {
         
         volume = 8000;
         concentration = 5;
-        
-        volumeIn = domini.getWaterReceivedVolume();
-        concentrationIn = domini.getWaterReceivedSolidsConcentration();       
-        volumeOut = domini.getReleasedWaterPerTimeUnit();
-        sanctionProbability = domini.getChanceOfDetectingIllegalDischarge();
-        sanctionPerTonDischarged = domini.getSanctionPerTonDischarged();
 
         
         final DFAgentDescription desc = new DFAgentDescription();
@@ -78,19 +78,17 @@ public class Environment extends Agent {
         parallelBehaviour.addSubBehaviour(new TickerBehaviour(this, 1000) {
             @Override
             protected void onTick() {
-                /*double currentVolume = Math.random() * 1000;
-                double currentConcentration = Math.random();*/
+                logger.info("ENVIRONMENT[currentVolume]: " + volume);
+                logger.info("ENVIRONMENT[currentConcentration]: " + concentration);
                 
                 float actualMass = volume*concentration;
                 float incomingMass = volumeIn*concentrationIn;
                 volume += volumeIn;
                 actualMass += incomingMass;
-                concentration = actualMass/volume;
-                
-                volume -= volumeOut;
+                if (volume > 0) concentration = actualMass/volume;
+                else concentration = 0;
 
-                logger.info("ENVIRONMENT[currentVolume]: " + volume);
-                logger.info("ENVIRONMENT[currentConcentration]: " + concentration);
+                volume -= volumeOut;
                
             }
         });
@@ -111,7 +109,6 @@ public class Environment extends Agent {
                     final ServiceDescription service = (ServiceDescription) services.next();
                     // Industria 
                     if (service.getType().equals("Industry")) {
-                        
                         // recibir mensaje discharge de industria
                         String str = request.getContent();
                         str = str.replace("(", "").replace(")", "");
@@ -121,17 +118,15 @@ public class Environment extends Agent {
                         float massIn = volumeIn*concentrationIn;
                         volume += volumeIn;
                         float finalMass = volume*concentration+massIn;
-                        concentration = finalMass/volume;
+                        if (volume > 0) concentration = finalMass/volume;
+                        else concentration = 0;
                         
                         float sanctionProbability = OntologyParser.parse().getChanceOfDetectingIllegalDischarge();
                         float r = ((float)Math.random()*100)%100;                       
                         // Descarga ilegal pillada
                         if (r <= sanctionProbability) {
-                            float sanctionPrice = sanctionPerTonDischarged * massIn/1000;
-                            String msg = "(sanction :cost ";
-                            msg += sanctionPrice;
-                            msg += ")";
-                            System.out.println(msg);
+                            float sanctionPrice = sanctionPerTonDischarged * massIn;
+                            String msg = "(sanction :cost " + sanctionPrice + ")";
                             reply.setPerformative(ACLMessage.REQUEST);
                             reply.setContent(msg);
                         }
@@ -139,9 +134,19 @@ public class Environment extends Agent {
                         else {
                             reply.setPerformative(ACLMessage.INFORM);
                         }
-                       
+                    } 
                     // Planta
-                    } else {
+                    else {
+                        String str = request.getContent();
+                        str = str.replace("(", "").replace(")", "");
+                        String[] splitted = str.split("\\s+");
+                        float volumeIn = Float.parseFloat(splitted[2]);
+                        float concentrationIn = Float.parseFloat(splitted[4]);
+                        float massIn = volumeIn*concentrationIn;
+                        volume += volumeIn;
+                        float finalMass = volume*concentration+massIn;
+                        if (volume > 0) concentration = finalMass/volume;
+                        else concentration = 0;
                         reply.setPerformative(ACLMessage.INFORM);
                     }
                     Environment.this.send(reply);
