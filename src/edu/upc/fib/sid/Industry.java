@@ -10,13 +10,30 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.proto.ContractNetInitiator;
+import java.net.URISyntaxException;
 
 import java.util.Date;
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Industry extends Agent {
+    private float cumulativeProfit;
+    private float storageOccupied; //Cantidad ocupada del deposito de la industria. metros cubicos (m3)
+    private float dischargeTick;
+    private WwtpDomain domini;
+    
     protected void setup() {
+        
+        cumulativeProfit = 0; //Empezamos habiendo ganado 0 unidades monetarias.
+        storageOccupied = 0; //Empezamos con el deposito vacio
+        
+        try {
+            domini = OntologyParser.parse();
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(Industry.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         final DFAgentDescription desc = new DFAgentDescription();
         desc.setName(getAID());
 
@@ -34,15 +51,14 @@ public class Industry extends Agent {
         this.addBehaviour(new TickerBehaviour(this, 1000) {
             @Override
             protected void onTick() {
-                final double cumulativeProfit = Math.random() * 100000;
-                final double currentAvailability = Math.random() * 750;
 
                 // Copy these two lines in your industry agent replacing 1 with your corresponding group id
-                Logger.getLogger("Industry-1").info("INDUSTRY[cumulativeProfit]: " + cumulativeProfit);
-                Logger.getLogger("Industry-1").info("INDUSTRY[currentAvailability]: " + currentAvailability);
+                Logger.getLogger("Industry-4").info("INDUSTRY[cumulativeProfit]: " + cumulativeProfit);
+                Logger.getLogger("Industry-4").info("INDUSTRY[maximumStorage]: " + domini.getIndustryStorageAvailability());
+                Logger.getLogger("Industry-4").info("INDUSTRY[storageOccupied]: " + storageOccupied);
                 //
 
-                if(Math.random() > 0.8) {
+                /*if(Math.random() > 0.8) {
                     final DFAgentDescription desc = new DFAgentDescription();
                     final ServiceDescription sdesc = new ServiceDescription();
                     sdesc.setType("Environment");
@@ -91,6 +107,54 @@ public class Industry extends Agent {
                     } catch (FIPAException e) {
                         e.printStackTrace();
                     }
+                }*/
+                final DFAgentDescription desc = new DFAgentDescription();
+                final ServiceDescription sdesc = new ServiceDescription();
+                sdesc.setType("TreatmentPlant");
+                desc.addServices(sdesc);
+                try {
+                    final DFAgentDescription[] plants = DFService.search(Industry.this, getDefaultDF(), desc,
+                            new SearchConstraints());
+                    final AID plant = plants[0].getName();
+                    final ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
+                    cfp.setSender(Industry.this.getAID());
+                    cfp.addReceiver(plant);
+                    dischargeTick = domini.getMaximumProduction() * domini.getWastePerProduction();
+                    cfp.setContent("(discharge :volume-water " + dischargeTick + " :concentration-pollutant 0.3)");
+                    cfp.setReplyByDate(new Date(System.currentTimeMillis() + 2000));
+                    Industry.this.addBehaviour(new ContractNetInitiator(Industry.this, cfp) {
+                        @Override
+                        protected void handleAllResponses(Vector responses, Vector acceptances) {
+                            for(Object response: responses) {
+                                ACLMessage msg = (ACLMessage) response;
+                                if (msg.getPerformative() == ACLMessage.PROPOSE) {
+                                    ACLMessage reply = msg.createReply();
+                                    String[] args = msg.getContent().split((" "));
+                                    String[] priceaux = args[2].split("\\)");
+                                    float price = Float.parseFloat(priceaux[0]); //Precio propuesto por la planta de tratamiento
+                                    System.out.println("El precio sugerido por la planta de tratamiento es de: " + price);
+                                    System.out.println("Mi beneficio seria de: " + (domini.getMaximumProduction() * domini.getProfitPerTonProduced() - price));
+                                    //Comportamiento basico. Si gano dinero acepto, sino rechazo
+                                    if (domini.getMaximumProduction() * domini.getProfitPerTonProduced() > price) {
+                                            System.out.println(getLocalName() + " - Accepting proposal from sender '"+ msg.getSender().getName() + "'");
+                                            reply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+                                            cumulativeProfit += domini.getMaximumProduction() * domini.getProfitPerTonProduced() - price;
+                                            // HAY QUE ENVIAR UN REQUEST A LA PLANTA PARA QUE SEPA QUE ESTAMOS DESCARGANDO O CON EL ACCEPT YA BASTA???????????????????????????????????????????????????????????????????????????????
+                                    }
+                                    else {
+                                        System.out.println(getLocalName() + " - Rejecting proposal from sender '"+ msg.getSender().getName() + "'");
+                                        reply.setPerformative(ACLMessage.REJECT_PROPOSAL);
+                                    }
+                                    acceptances.add(reply);
+                                }
+                                else if (msg.getPerformative() == ACLMessage.REJECT_PROPOSAL) {
+                                    Logger.getLogger("Industry-4").info("Propose has been rejected");
+                                }
+                            }
+                        }
+                    });
+                } catch (FIPAException e) {
+                    e.printStackTrace();
                 }
             }
         });
