@@ -41,22 +41,22 @@ public class Environment extends Agent {
         try {
             domini = OntologyParser.parse();
             volumeIn = domini.getWaterReceivedVolume();
-            concentrationIn = domini.getWaterReceivedSolidsConcentration();       
+            concentrationIn = domini.getWaterReceivedSolidsConcentration()/100;       
             volumeOut = domini.getReleasedWaterPerTimeUnit();
-            sanctionProbability = domini.getChanceOfDetectingIllegalDischarge();
+            sanctionProbability = domini.getChanceOfDetectingIllegalDischarge()/100;
             sanctionPerTonDischarged = domini.getSanctionPerTonDischarged();
             
         } catch (URISyntaxException ex) {
             Logger.getLogger(Environment.class.getName()).log(Level.SEVERE, null, ex);
             volumeIn = 2000;
-            concentrationIn = 5;
+            concentrationIn = 5/100;
             volumeOut = 2000;
-            sanctionProbability = 30;
+            sanctionProbability = 30/100;
             sanctionPerTonDischarged = 40;
         }
         
         volume = 8000;
-        concentration = 5;
+        concentration = 5/100;
 
         
         final DFAgentDescription desc = new DFAgentDescription();
@@ -122,9 +122,10 @@ public class Environment extends Agent {
                         else concentration = 0;
                         
                         float sanctionProbability = OntologyParser.parse().getChanceOfDetectingIllegalDischarge();
-                        float r = ((float)Math.random()*100)%100;                       
+                        float r = (float)Math.random();          
                         // Descarga ilegal pillada
                         if (r <= sanctionProbability) {
+                            System.out.println("Rio: descarga ilegal pillado");
                             float sanctionPrice = sanctionPerTonDischarged * massIn;
                             String msg = "(sanction :cost " + sanctionPrice + ")";
                             reply.setPerformative(ACLMessage.REQUEST);

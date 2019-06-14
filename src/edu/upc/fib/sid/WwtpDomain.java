@@ -3,7 +3,7 @@ package edu.upc.fib.sid;
 class WwtpDomain {
     private float maximumProduction, industryStorageAvailability, wastePerProduction, chanceOfDetectingIllegalDischarge,
             releasedWaterPerTimeUnit, waterReceivedVolume, waterReceivedSolidsConcentration, suspendedSolidsTreated,
-            plantStorageAvailability;
+            plantStorageAvailability, pollutantGenerated;
     private int profitPerTonProduced, sanctionPerTonDischarged, costPerCubicMeterTreated, costPerTonOfPollutantTreated,
             timeUnit;
 
@@ -24,7 +24,16 @@ class WwtpDomain {
                 ", costPerCubicMeterTreated=" + costPerCubicMeterTreated +
                 ", costPerTonOfPollutantTreated=" + costPerTonOfPollutantTreated +
                 ", timeUnit=" + timeUnit +
+                ", pollutantGenerated=" + pollutantGenerated + 
                 '}';
+    }
+    
+    public float getPollutantGenerated() {
+        return pollutantGenerated;
+    }
+    
+    public void setPollutantGenerated(float pollutantGenerated) {
+        this.pollutantGenerated = pollutantGenerated;
     }
 
     public float getMaximumProduction() {

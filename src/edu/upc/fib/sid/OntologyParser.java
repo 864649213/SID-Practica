@@ -27,6 +27,7 @@ public class OntologyParser {
         Individual plantaBesos = model.getIndividual("http://fib.upc.edu/sid/2019/wwtp#PlantaBesos");
         Individual suspendedSolidsTreated = model.getIndividual("http://fib.upc.edu/sid/2019/wwtp#PlantaBesosSuspendedSolidsTreated");
         Individual sidBesosRiver2019 = model.getIndividual("http://fib.upc.edu/sid/2019/wwtp#SIDBesosRiver2019");
+        Individual foodSuspendedSolidsGeneration = model.getIndividual("http://fib.upc.edu/sid/2019/wwtp#FoodSuspendedSolidsGeneration");
 
         Property maximumProduction = model.getProperty("http://fib.upc.edu/sid/2019/wwtp#maximumProduction");
         Property profitPerTonProduced = model.getProperty("http://fib.upc.edu/sid/2019/wwtp#profitPerTonProduced");
@@ -55,6 +56,8 @@ public class OntologyParser {
         domain.setCostPerTonOfPollutantTreated(plantaBesos.getPropertyValue(costPerTonOfPollutantTreated).asLiteral().getInt());
         domain.setPlantStorageAvailability(plantaBesos.getPropertyValue(storageAvailability).asLiteral().getFloat());
         domain.setTimeUnit(sidBesosRiver2019.getPropertyValue(hasTimeUnit).asLiteral().getInt());
+        
+        domain.setPollutantGenerated(foodSuspendedSolidsGeneration.getPropertyValue(hasValue).asLiteral().getFloat());
 
         return domain;
     }

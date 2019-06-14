@@ -11,6 +11,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.ContractNetResponder;
 import java.net.URISyntaxException;
+import java.util.Date;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -24,6 +25,7 @@ public class TreatmentPlant extends Agent {
     float actMass;  // in tons
     float costPerMCubicWater;
     float costPerTonsSolid;
+    float profitFactor = 1;
     
     private WwtpDomain domini;
 
@@ -74,6 +76,7 @@ public class TreatmentPlant extends Agent {
                 })) {
             @Override
             protected ACLMessage handleCfp(ACLMessage cfp) {
+                //System.out.println("Planta: " + new Date());
                 heldConversations.add(cfp.getConversationId());
                 String str = cfp.getContent();
                 str = str.replace("(", "").replace(")", "");
@@ -88,7 +91,7 @@ public class TreatmentPlant extends Agent {
                 if(actVolume + volumeIn <= maxVolume) {
                     reply.setPerformative(ACLMessage.PROPOSE);
                     float price = volumeIn*costPerMCubicWater + massIn*costPerTonsSolid;
-                    price = 2*price; // beneficio 100%
+                    price = profitFactor*price; // beneficio
                     String msg = "(transaction :price " + price + ")";
                     reply.setContent(msg);
                 } 
@@ -96,7 +99,7 @@ public class TreatmentPlant extends Agent {
                     if (Math.random() <= 0.3) {
                         reply.setPerformative(ACLMessage.PROPOSE);
                         float price = volumeIn*costPerMCubicWater + massIn*costPerTonsSolid;
-                        price = 4*price; // beneficio 300%
+                        price = (float)1.5*profitFactor*price; // mas precio
                         String msg = "(transaction :price " + price + ")";
                         reply.setContent(msg);
                     }
@@ -115,7 +118,7 @@ public class TreatmentPlant extends Agent {
                 float concentrationIn = Float.parseFloat(splitted[4]);
                 float massIn = volumeIn * concentrationIn;
                 if(actVolume + volumeIn <= maxVolume) { // al rio directamente
-                    sendToEnvironment(volumeIn, concentrationIn);
+                    dischargeToEnvironment(volumeIn, concentrationIn);
                 }
                 else {  // guardarlo para enviar al siguiente tick
                     actVolume += volumeIn;
@@ -132,11 +135,12 @@ public class TreatmentPlant extends Agent {
             @Override
             protected void onTick() {
                 float currentConcentration = actMass/actVolume;
+                if (actVolume == 0) currentConcentration = 0;
 
                 logger.info("TREATMENTPLANT[currentConcentration]: " + currentConcentration);
                 logger.info("TREATMENTPLANT[currentAvailability]: " + actVolume);
 
-                sendToEnvironment(actVolume, currentConcentration);
+                dischargeToEnvironment(actVolume, currentConcentration);
                 actVolume = 0;
                 actMass = 0;
                 
@@ -146,14 +150,13 @@ public class TreatmentPlant extends Agent {
         this.addBehaviour(parallelBehaviour);
     }
     
-    public void sendToEnvironment(float volume, float concentration) {
+    public void dischargeToEnvironment(float volume, float concentration) {
         final DFAgentDescription desc = new DFAgentDescription();
         final ServiceDescription sdesc = new ServiceDescription();
         sdesc.setType("Environment");
         desc.addServices(sdesc);
         try {
-            final DFAgentDescription[] environments = DFService.search(TreatmentPlant.this, getDefaultDF(), desc,
-                    new SearchConstraints());
+            final DFAgentDescription[] environments = DFService.search(TreatmentPlant.this, getDefaultDF(), desc, new SearchConstraints());
             final AID environment = environments[0].getName();
             final ACLMessage aclMessage = new ACLMessage(ACLMessage.REQUEST);
             aclMessage.setSender(TreatmentPlant.this.getAID());
