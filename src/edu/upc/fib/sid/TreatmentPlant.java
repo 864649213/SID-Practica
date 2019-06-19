@@ -25,7 +25,8 @@ public class TreatmentPlant extends Agent {
     float actMass;  // in tons
     float costPerMCubicWater;
     float costPerTonsSolid;
-    float profitFactor = 1;
+    float profit;
+    float profitFactor = (float)1.1;
     
     private WwtpDomain domini;
 
@@ -42,6 +43,7 @@ public class TreatmentPlant extends Agent {
         }
         actVolume = 0;
         actMass = 0;
+        profit = 0;
         
         
         final DFAgentDescription desc = new DFAgentDescription();
@@ -60,6 +62,25 @@ public class TreatmentPlant extends Agent {
         
 
         final ParallelBehaviour parallelBehaviour = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
+        
+        parallelBehaviour.addSubBehaviour(new TickerBehaviour(this, 1000) {
+            @Override
+            protected void onTick() {
+                float currentConcentration;
+                if (actVolume == 0) currentConcentration = 0;
+                else currentConcentration = actMass/actVolume;
+
+                logger.info("TREATMENTPLANT[currentConcentration]: " + currentConcentration);
+                logger.info("TREATMENTPLANT[currentAvailability]: " + actVolume);
+                logger.info("TREATMENTPLANT[profit]: " + profit);
+
+                dischargeToEnvironment(actVolume, currentConcentration);
+                actVolume = 0;
+                actMass = 0;
+                
+            }
+        });
+        
 
         final Set<String> heldConversations = new TreeSet<>();
         final ContractNetResponder responder = new ContractNetResponder(this, new MessageTemplate(
@@ -90,19 +111,27 @@ public class TreatmentPlant extends Agent {
                 // aun hay espacio
                 if(actVolume + volumeIn <= maxVolume) {
                     reply.setPerformative(ACLMessage.PROPOSE);
-                    float price = volumeIn*costPerMCubicWater + massIn*costPerTonsSolid;
-                    price = profitFactor*price; // beneficio
+                    float cost = volumeIn*costPerMCubicWater + massIn*costPerTonsSolid;
+                    float price = profitFactor*cost; // beneficio
                     String msg = "(transaction :price " + price + ")";
                     reply.setContent(msg);
                 } 
                 else {  // no hay espacio, verter agua con contaminacion al rio, subir precio o rechazo
-                    if (Math.random() <= 0.3) {
+                    if (Math.random() <= 0.5) {
                         reply.setPerformative(ACLMessage.PROPOSE);
-                        float price = volumeIn*costPerMCubicWater + massIn*costPerTonsSolid;
-                        price = (float)1.5*profitFactor*price; // mas precio
+                        
+                        float volumeToStore = maxVolume-actVolume;
+                        float massToStore = volumeToStore*concentrationIn;
+                        float volumeToEnvironment = volumeIn-volumeToStore;
+                        float massToEnvironment = volumeToEnvironment*concentrationIn;
+                        
+                        float normalCost = volumeToStore*costPerMCubicWater + massToStore*costPerTonsSolid;
+                        float extraCost = volumeToEnvironment*costPerMCubicWater + massToEnvironment*costPerTonsSolid;
+                        float price = profitFactor*(normalCost + 2*extraCost); 
                         String msg = "(transaction :price " + price + ")";
                         reply.setContent(msg);
                     }
+                    
                     else reply.setPerformative(ACLMessage.REFUSE);
                 }
                 return reply;
@@ -117,12 +146,25 @@ public class TreatmentPlant extends Agent {
                 float volumeIn = Float.parseFloat(splitted[2]);
                 float concentrationIn = Float.parseFloat(splitted[4]);
                 float massIn = volumeIn * concentrationIn;
-                if(actVolume + volumeIn <= maxVolume) { // al rio directamente
-                    dischargeToEnvironment(volumeIn, concentrationIn);
+                if(actVolume + volumeIn <= maxVolume) { // al rio directamente      
+                    float volumeToStore = maxVolume-actVolume;
+                    float massToStore = volumeToStore*concentrationIn;
+                    float volumeToEnvironment = volumeIn-volumeToStore;
+                    float massToEnvironment = volumeToEnvironment*concentrationIn;
+                    float concentrationToEnvironment = massToEnvironment/volumeToEnvironment;
+                    float normalProfit = volumeToStore*costPerMCubicWater + massToStore*costPerTonsSolid;
+                    float extraProfit = volumeToEnvironment*costPerMCubicWater + massToEnvironment*costPerTonsSolid;
+                    
+                    actVolume += volumeToStore;
+                    actMass += massToStore;
+                    profit += normalProfit + extraProfit;
+                         
+                    dischargeToEnvironment(volumeToEnvironment, concentrationToEnvironment);
                 }
                 else {  // guardarlo para enviar al siguiente tick
                     actVolume += volumeIn;
                     actMass += massIn; 
+                    profit += profitFactor*(volumeIn*costPerMCubicWater + massIn*costPerTonsSolid);
                 }
                 
                 reply.setPerformative(ACLMessage.INFORM);
@@ -130,22 +172,6 @@ public class TreatmentPlant extends Agent {
             }
         };
         parallelBehaviour.addSubBehaviour(responder);
-
-        parallelBehaviour.addSubBehaviour(new TickerBehaviour(this, 1000) {
-            @Override
-            protected void onTick() {
-                float currentConcentration = actMass/actVolume;
-                if (actVolume == 0) currentConcentration = 0;
-
-                logger.info("TREATMENTPLANT[currentConcentration]: " + currentConcentration);
-                logger.info("TREATMENTPLANT[currentAvailability]: " + actVolume);
-
-                dischargeToEnvironment(actVolume, currentConcentration);
-                actVolume = 0;
-                actMass = 0;
-                
-            }
-        });
 
         this.addBehaviour(parallelBehaviour);
     }

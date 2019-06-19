@@ -121,7 +121,6 @@ public class Environment extends Agent {
                         if (volume > 0) concentration = finalMass/volume;
                         else concentration = 0;
                         
-                        float sanctionProbability = OntologyParser.parse().getChanceOfDetectingIllegalDischarge();
                         float r = (float)Math.random();          
                         // Descarga ilegal pillada
                         if (r <= sanctionProbability) {
@@ -154,9 +153,6 @@ public class Environment extends Agent {
                     
                 } catch (FIPAException e) {
                     e.printStackTrace();
-                    
-                } catch (URISyntaxException ex) {
-                    Logger.getLogger(Environment.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
