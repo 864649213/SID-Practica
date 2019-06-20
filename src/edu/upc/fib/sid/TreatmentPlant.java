@@ -71,11 +71,13 @@ public class TreatmentPlant extends Agent {
                 else currentConcentration = actMass/actVolume;
 
                 logger.info("TREATMENTPLANT[currentConcentration]: " + currentConcentration);
-                logger.info("TREATMENTPLANT[currentAvailability]: " + actVolume);
+                logger.info("TREATMENTPLANT[storageOccupied]: " + actVolume);
+                logger.info("TREATMENTPLANT[maximumStorage]: " + domini.getPlantStorageAvailability());
                 logger.info("TREATMENTPLANT[profit]: " + profit);
 
                 dischargeToEnvironment(actVolume, currentConcentration);
                 actVolume = 0;
+                //if (Math.random() < 0.5) actVolume = 750;
                 actMass = 0;
                 
             }
@@ -146,7 +148,7 @@ public class TreatmentPlant extends Agent {
                 float volumeIn = Float.parseFloat(splitted[2]);
                 float concentrationIn = Float.parseFloat(splitted[4]);
                 float massIn = volumeIn * concentrationIn;
-                if(actVolume + volumeIn <= maxVolume) { // al rio directamente      
+                if(actVolume + volumeIn > maxVolume) { // al rio directamente      
                     float volumeToStore = maxVolume-actVolume;
                     float massToStore = volumeToStore*concentrationIn;
                     float volumeToEnvironment = volumeIn-volumeToStore;

@@ -31,6 +31,9 @@ public class Industry extends Agent {
     private float industryProfitFactor;
     private float productionUpperBound; 
     private float productionLowerBound; 
+    private float volFromStorage;    // from storage
+    private float fractionFromStorage;
+    private boolean storage_freed;
     
     private int ticks = 0;
     
@@ -77,8 +80,12 @@ public class Industry extends Agent {
                 
                 updateProfitIfSanction();   // Si tenemos una sanción 
                 cfpWithProduction(production);
-                //dischargeToEnvironment(calculateWasteVolume(production), domini.getPollutantGenerated()/100); // Solo para probar que todo funciona
-     
+                
+                if (ticks % 10 == 0) { // restablecemos los limites, cada cuantos ticks
+                    productionUpperBound = domini.getMaximumProduction();
+                    productionLowerBound = 0;
+                }
+                
             }
         });
              
@@ -98,7 +105,14 @@ public class Industry extends Agent {
             cfp.setSender(Industry.this.getAID());
             cfp.addReceiver(plant);
 
-            float wasteWater = calculateWasteVolume(production);
+            volFromStorage = 0;
+            storage_freed = false;
+            if (storageOccupied >= 0.2*domini.getIndustryStorageAvailability())  {
+                volFromStorage = (float)0.2*domini.getIndustryStorageAvailability();
+                storage_freed = true;
+            }
+            float wasteWater = calculateWasteVolume(production) + volFromStorage;
+            fractionFromStorage = volFromStorage/wasteWater;
             cfp.setContent("(discharge :volume-water " + wasteWater + " :concentration-pollutant " + domini.getPollutantGenerated()/100 +")");
             cfp.setReplyByDate(new Date(System.currentTimeMillis() + 2000));
             
@@ -112,8 +126,10 @@ public class Industry extends Agent {
                             String str = msg.getContent();
                             str = str.replace("(", "").replace(")", "");
                             String[] splitted = str.split("\\s+");
-                            float cost = Float.parseFloat(splitted[2]);
-                            float profitWithoutCost = production * domini.getProfitPerTonProduced();
+                            float totalCost = Float.parseFloat(splitted[2]);
+                            float costFromStorage = totalCost*fractionFromStorage;
+                            float cost = totalCost - costFromStorage;
+                            float profitWithoutCost = production * domini.getProfitPerTonProduced();    // ganamos solo que producimos en este tick
                             float profitFactor = profitWithoutCost/cost;
                             float realProfit = profitWithoutCost - cost;
                             
@@ -126,27 +142,31 @@ public class Industry extends Agent {
                                 reply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
                                 cumulativeProfit += realProfit;
                                 productionLowerBound = production;
+                                if (storage_freed) storageOccupied -= volFromStorage;
                                 System.out.println("En el tick " + ticks + " pasamos el agua residual a la planta " + 
                                             calculateWasteVolume(production) + "m3");
                             }
                             else {  // si no renta
                                 System.out.println(getLocalName() + " - Rejecting proposal from sender '"+ msg.getSender().getName() + "'");
                                 reply.setPerformative(ACLMessage.REJECT_PROPOSAL);
-                                if (Math.random() <= 0.25) { // Tiramos el agua illegalmente al rio
-                                    float volume = domini.getMaximumProduction();   // Si lo hacemos, tiramos con toda la producción
-                                    dischargeToEnvironment(volume, domini.getPollutantGenerated()/100);
-                                    cumulativeProfit += profitWithoutCost;
-                                    System.out.println("En el tick " + ticks + " vertemos el agua residual al rio " + 
-                                            volume + "m3");
-                                } 
-                                else {  // guardamos el agua residual
-                                    float storageBefore = storageOccupied;
-                                    storageOccupied += wasteWater;
-                                    if (storageOccupied > domini.getIndustryStorageAvailability()) storageOccupied = domini.getIndustryStorageAvailability();
-                                    System.out.println("En el tick " + ticks + " guardamos el agua residual al tanque " + 
-                                            (storageOccupied-storageBefore) + "m3");
+                                if (Math.random() <= 0.2) { // Tiramos el agua illegalmente al rio
+                                    float potentialSanctionPrice = wasteWater*domini.getPollutantGenerated()/100;
+                                    if (cumulativeProfit > 2*potentialSanctionPrice) {  // Si ya tenemos bastante dinero, podemos arriesgar un poco
+                                        dischargeToEnvironment(wasteWater, domini.getPollutantGenerated()/100);
+                                        cumulativeProfit += profitWithoutCost;
+                                        if (storage_freed) storageOccupied -= volFromStorage;
+                                        System.out.println("En el tick " + ticks + " vertemos el agua residual al rio " + 
+                                                wasteWater + "m3");
+                                    }
                                 }
-                                
+                            }
+                            float remainingSpace = domini.getIndustryStorageAvailability() - storageOccupied; //m3 libres en el deposito
+                            float productionAvailable = remainingSpace / domini.getWastePerProduction(); // m3 / (m3/ton) = ton
+                            if (productionAvailable > (domini.getMaximumProduction() - production)) productionAvailable = (domini.getMaximumProduction() - production);
+                            System.out.println("------------------------ ESPACIO DISPONIBLE: " + remainingSpace + " --------- Produccion disponible: " + productionAvailable);
+                            if (productionAvailable > 0) {
+                                storageOccupied += calculateWasteVolume(productionAvailable);
+                                cumulativeProfit += productionAvailable * domini.getProfitPerTonProduced();
                             }
                             acceptances.add(reply);
                             
@@ -169,7 +189,7 @@ public class Industry extends Agent {
     public void updateProfitIfSanction() {
         final MessageTemplate mt = new MessageTemplate((MessageTemplate.MatchExpression) aclMessage -> true);
                 final ACLMessage request = Industry.this.receive(mt);
-                if (request != null) {
+                if (request != null && request.getPerformative() == ACLMessage.REQUEST) {
                     final AID sender = request.getSender();
                     final ACLMessage reply = request.createReply();
 
@@ -183,6 +203,7 @@ public class Industry extends Agent {
                         if (service.getType().equals("Environment")) {
                             // recibir mensaje discharge de industria
                             String str = request.getContent();
+                            System.out.println("------------------------------------------------------------------------" + str);
                             str = str.replace("(", "").replace(")", "");
                             String[] splitted = str.split("\\s+");
                             float sanctionAmount = Float.parseFloat(splitted[2]);
@@ -221,4 +242,3 @@ public class Industry extends Agent {
     }
     
 }
-
