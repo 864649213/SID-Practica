@@ -1,8 +1,8 @@
-### Sistemes Intel·ligents Distribuïts (2019 Q1) final project
+# Sistemes Intel·ligents Distribuïts (2019 Q1) Final Project
 
 Polluted water management system for industry and treament plants simulated with agents (Jade), ontology (Proteus) and semantic web (Jena).
 
-# How to execute
+### How to execute
 
 To execute the platform:
 
